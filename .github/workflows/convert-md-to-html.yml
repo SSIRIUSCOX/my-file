@@ -1,0 +1,35 @@
+name: Convert Markdown to HTML
+
+on:
+  push:
+    branches:
+      - main  # 当有新的代码推送到 main 分支时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Install Pandoc
+      - name: Install Pandoc
+        run: sudo apt-get install -y pandoc
+
+      # Step 3: Convert Markdown to HTML
+      - name: Convert .md files to .html
+        run: |
+          mkdir -p html_files  # 创建一个存放 HTML 文件的目录
+          for file in *.md; do
+            pandoc "$file" -o "html_files/${file%.md}.html"
+          done
+
+      # Step 4: Upload the converted HTML files as artifacts
+      - name: Upload HTML files
+        uses: actions/upload-artifact@v3
+        with:
+          name: converted-html
+          path: html_files
+
